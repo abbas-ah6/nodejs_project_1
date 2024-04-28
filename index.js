@@ -1,7 +1,7 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
-
+const templateFun = require('./modules/template-module');
 //|||||||||| FILES
 
 // const inputFile = fs.readFileSync('./txt/input.txt', 'utf-8');
@@ -31,20 +31,6 @@ const url = require('url');
 // console.log("Reading files async");
 
 //|||||||||| SERVER
-
-const templateFun = (temp, item) => {
-    let outPut = temp.replace(/{%PRODUCTNAME%}/g, item.productName);
-    outPut = outPut.replace(/{%IMAGE%}/g, item.image);
-    outPut = outPut.replace(/{%FROM%}/g, item.from);
-    outPut = outPut.replace(/{%PRICE%}/g, item.price);
-    outPut = outPut.replace(/{%NUTRIENTS%}/g, item.nutrients);
-    outPut = outPut.replace(/{%QUANTITY%}/g, item.quantity);
-    outPut = outPut.replace(/{%DESCRIPTION%}/g, item.description);
-    outPut = outPut.replace(/{%ID%}/g, item.id);
-    if (!item.organic) outPut = outPut.replace(/{%NOTORGANIC%}/g, 'not-organic');
-
-    return outPut;
-}
 
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
 const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
