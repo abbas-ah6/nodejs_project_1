@@ -1,7 +1,11 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
+
+const slugify = require('slugify');
+
 const templateFun = require('./modules/template-module');
+
 //|||||||||| FILES
 
 // const inputFile = fs.readFileSync('./txt/input.txt', 'utf-8');
@@ -32,54 +36,68 @@ const templateFun = require('./modules/template-module');
 
 //|||||||||| SERVER
 
-const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
-const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
-const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
-const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8')
+const tempOverview = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  'utf-8',
+);
+const tempCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  'utf-8',
+);
+const tempProduct = fs.readFileSync(
+  `${__dirname}/templates/template-product.html`,
+  'utf-8',
+);
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const productsObj = JSON.parse(data);
 
+// The below code is for testing and understanding the slugify package. It generates slugs from the product name which is stored in the productObj array.
+// const slugs = productsObj.map(el => slugify(el.productName, { lower: true }));
+// console.log(slugs);
+
 const server = http.createServer((req, res) => {
-    const { query, pathname } = url.parse(req.url, true);
+  const { query, pathname } = url.parse(req.url, true);
 
-    // OVERVIEW
-    if (pathname === '/' || pathname === '/overview') {
+  // OVERVIEW
+  if (pathname === '/' || pathname === '/overview') {
+    const cardsHtml = productsObj
+      .map((el) => templateFun(tempCard, el))
+      .join('');
+    const outPut = tempOverview.replace(/%PRODUCTCARDS%/g, cardsHtml);
+    res.writeHead(200, {
+      'Content-type': 'text/html',
+    });
+    res.end(outPut);
+  }
 
-        const cardsHtml = productsObj.map(el => templateFun(tempCard, el)).join('');
-        const outPut = tempOverview.replace(/%PRODUCTCARDS%/g, cardsHtml);
-        res.writeHead(200, {
-            'Content-type': 'text/html'
-        })
-        res.end(outPut);
-    }
+  // PRODUCT
+  else if (pathname === '/product') {
+    res.writeHead(200, {
+      'Content-type': 'text/html',
+    });
+    const product = productsObj[query.id];
+    const outPut = templateFun(tempProduct, product);
+    res.end(outPut);
+  }
 
-    // PRODUCT
-    else if (pathname === "/product") {
-        res.writeHead(200, {
-            'Content-type': 'text/html'
-        })
-        const product = productsObj[query.id];
-        const outPut = templateFun(tempProduct, product);
-        res.end(outPut);
-    }
+  // API
+  else if (pathname === '/api') {
+    res.writeHead(200, {
+      'Content-type': 'application/json',
+    });
+    res.end(data);
+  }
 
-    // API
-    else if (pathname === '/api') {
-        res.writeHead(200, {
-            'Content-type': 'application/json'
-        })
-        res.end(data);
-    }
-
-    // NOT FOUND
-    else {
-        res.writeHead(404, {
-            'Content-type': 'text/html',
-            'custom-header': 'my custom header'
-        })
-        res.end('<h1>Page Not Found!</h1>')
-    }
-})
+  // NOT FOUND
+  else {
+    res.writeHead(404, {
+      'Content-type': 'text/html',
+      'custom-header': 'my custom header',
+    });
+    res.end('<h1>Page Not Found!</h1>');
+  }
+});
 
 server.listen('8000', '127.0.0.1', () => {
-    console.log('Server is running on port 8000');
-})
+  console.log('Server is running on port 8000');
+});

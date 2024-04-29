@@ -1,0 +1,10 @@
+    "slugify": "^1.6.6"
+Every npm package version is divided into three parts like the above 1.6.6, and each part has its own meaning.
+    - Part one (1) => it is called Major version. When this changes it can have some breaking changes, new features and bugs fixes.
+    - Part two (6) => It is called Minor version. When this changes it can have new features of the specific package.
+    - Part three (6) => It is called Patch version. When it relases it is mostly for bugs fixes.
+
+The signs before every package version has also its own meaning. There are three type of signs: (^, ~, *);
+    - ^ This sign before a package version means that it accpect all Patch and Minor relases.
+    - ~ This sign before a package version means that it accpect only the Patch relases.
+    - * This sign befor a package version means that it accpect All the relases. (Major, Minor and Patch) relases. 
